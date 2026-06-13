@@ -31,7 +31,7 @@ defmodule PhoenixShield.User do
       Checks if the user has a specific role by its slug.
       Automatically preloads roles if not already loaded.
       """
-      def has_role?(%__MODULE__{} = user, role_slug) when is_binary(role_slug) do
+      def has_role?(user, role_slug) when is_binary(role_slug) and is_map(user) do
         user = if Ecto.assoc_loaded?(user.roles), do: user, else: Config.repo().preload(user, :roles)
         Enum.any?(user.roles, &(&1.slug == role_slug))
       end
@@ -40,7 +40,7 @@ defmodule PhoenixShield.User do
       Checks if the user has any of the provided roles.
       Automatically preloads roles if not already loaded.
       """
-      def has_any_role?(%__MODULE__{} = user, role_slugs) when is_list(role_slugs) do
+      def has_any_role?(user, role_slugs) when is_list(role_slugs) and is_map(user) do
         user = if Ecto.assoc_loaded?(user.roles), do: user, else: Config.repo().preload(user, :roles)
         Enum.any?(user.roles, &(&1.slug in role_slugs))
       end
@@ -49,7 +49,7 @@ defmodule PhoenixShield.User do
       Checks if the user has all of the provided roles.
       Automatically preloads roles if not already loaded.
       """
-      def has_all_roles?(%__MODULE__{} = user, role_slugs) when is_list(role_slugs) do
+      def has_all_roles?(user, role_slugs) when is_list(role_slugs) and is_map(user) do
         user = if Ecto.assoc_loaded?(user.roles), do: user, else: Config.repo().preload(user, :roles)
         user_slugs = Enum.map(user.roles, & &1.slug)
         Enum.all?(role_slugs, &(&1 in user_slugs))
@@ -59,7 +59,7 @@ defmodule PhoenixShield.User do
       Checks if the user has a specific permission by its slug.
       Delegates to PhoenixShield.Authorization.can? but works directly on the user struct.
       """
-      def can?(%__MODULE__{} = user, permission_slug) when is_binary(permission_slug) do
+      def can?(user, permission_slug) when is_binary(permission_slug) and is_map(user) do
         PhoenixShield.Authorization.can?(user, permission_slug)
       end
 
@@ -67,7 +67,7 @@ defmodule PhoenixShield.User do
       Gets all permissions for the user.
       Automatically preloads all necessary associations if needed.
       """
-      def get_permissions(%__MODULE__{} = user) do
+      def get_permissions(user) when is_map(user) do
         PhoenixShield.Authorization.get_user_permissions(user)
       end
     end
