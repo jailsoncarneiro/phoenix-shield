@@ -4,14 +4,32 @@ defmodule PhoenixShield.MixProject do
   def project do
     [
       app: :phoenix_shield,
-      version: "0.1.0",
+      version: "1.0.0-alpha",
       elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      # ExDoc configuration
+      name: "PhoenixShield",
+      description: "A powerful Role-Based Access Control (RBAC) library for Phoenix Framework",
+      package: package(),
+      source_url: "https://github.com/yourusername/phoenix_shield",
+      homepage_url: "https://github.com/yourusername/phoenix_shield",
+      docs: [
+        main: "readme",
+        extras: ["README.md"]
+      ]
+    ]
+  end
+
+  defp package do
+    [
+      maintainers: ["Your Name"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/yourusername/phoenix_shield"}
     ]
   end
 
@@ -64,7 +82,10 @@ defmodule PhoenixShield.MixProject do
       {:gettext, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      # Documentation dependencies
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false},
+      {:earmark, "~> 1.4", only: :dev, runtime: false}
     ]
   end
 
