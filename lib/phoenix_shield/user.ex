@@ -1,23 +1,73 @@
 defmodule PhoenixShield.User do
-  use Ecto.Schema
-  import Ecto.Changeset
+  @moduledoc """
+  A macro module that injects PhoenixShield's roles association and helper functions
+  into the host application's User schema.
 
-  schema "users" do
-    field :email, :string
-    field :password_hash, :string
+  ## Usage
+      defmodule MyApp.Accounts.User do
+        use Ecto.Schema
+        use PhoenixShield.User
 
-    many_to_many :roles, PhoenixShield.Role,
-      join_through: "user_roles",
-      on_delete: :delete_all
+        schema "users" do
+          # ... your existing fields
+        end
+      end
+  """
+  defmacro __using__(_opts) do
+    quote bind_quoted: [], unquote: true do
+      import Ecto.Schema
+      alias PhoenixShield.Config
+      alias PhoenixShield.Role
 
-    timestamps(type: :utc_datetime)
-  end
+      # Inject the many-to-many roles association automatically
+      many_to_many :roles, Role,
+        join_through: "user_roles",
+        on_delete: :delete_all,
+        on_replace: :delete
 
-  @doc false
-  def changeset(user, attrs) do
-    user
-    |> cast(attrs, [:email, :password_hash])
-    |> validate_required([:email, :password_hash])
-    |> unique_constraint(:email)
+      @doc """
+      Checks if the user has a specific role by its slug.
+      Automatically preloads roles if not already loaded.
+      """
+      def has_role?(%__MODULE__{} = user, role_slug) when is_binary(role_slug) do
+        user = if Ecto.assoc_loaded?(user.roles), do: user, else: Config.repo().preload(user, :roles)
+        Enum.any?(user.roles, &(&1.slug == role_slug))
+      end
+
+      @doc """
+      Checks if the user has any of the provided roles.
+      Automatically preloads roles if not already loaded.
+      """
+      def has_any_role?(%__MODULE__{} = user, role_slugs) when is_list(role_slugs) do
+        user = if Ecto.assoc_loaded?(user.roles), do: user, else: Config.repo().preload(user, :roles)
+        Enum.any?(user.roles, &(&1.slug in role_slugs))
+      end
+
+      @doc """
+      Checks if the user has all of the provided roles.
+      Automatically preloads roles if not already loaded.
+      """
+      def has_all_roles?(%__MODULE__{} = user, role_slugs) when is_list(role_slugs) do
+        user = if Ecto.assoc_loaded?(user.roles), do: user, else: Config.repo().preload(user, :roles)
+        user_slugs = Enum.map(user.roles, & &1.slug)
+        Enum.all?(role_slugs, &(&1 in user_slugs))
+      end
+
+      @doc """
+      Checks if the user has a specific permission by its slug.
+      Delegates to PhoenixShield.Authorization.can? but works directly on the user struct.
+      """
+      def can?(%__MODULE__{} = user, permission_slug) when is_binary(permission_slug) do
+        PhoenixShield.Authorization.can?(user, permission_slug)
+      end
+
+      @doc """
+      Gets all permissions for the user.
+      Automatically preloads all necessary associations if needed.
+      """
+      def get_permissions(%__MODULE__{} = user) do
+        PhoenixShield.Authorization.get_user_permissions(user)
+      end
+    end
   end
 end

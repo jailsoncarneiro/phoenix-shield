@@ -6,17 +6,12 @@ defmodule PhoenixShield.Role do
     field :name, :string
     field :slug, :string
     field :description, :string
-
     many_to_many :permissions, PhoenixShield.Permission,
       join_through: "role_permissions",
       on_delete: :delete_all,
       on_replace: :delete
 
-    many_to_many :users, PhoenixShield.User,
-      join_through: "user_roles",
-      on_delete: :delete_all
-
-    timestamps(type: :utc_datetime)
+    timestamps()
   end
 
   @doc false
