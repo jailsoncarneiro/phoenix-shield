@@ -4,11 +4,13 @@ defmodule PhoenixShield.User do
   into the host application's User schema.
 
   ## Usage
+      **Important:** `use PhoenixShield.User` MUST be placed INSIDE the `schema do ... end` block, because it injects Ecto's `many_to_many` association which requires a schema context.
+
       defmodule MyApp.Accounts.User do
         use Ecto.Schema
-        use PhoenixShield.User
 
         schema "users" do
+          use PhoenixShield.User
           # ... your existing fields
         end
       end
