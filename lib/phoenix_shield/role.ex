@@ -9,7 +9,8 @@ defmodule PhoenixShield.Role do
 
     many_to_many :permissions, PhoenixShield.Permission,
       join_through: "role_permissions",
-      on_delete: :delete_all
+      on_delete: :delete_all,
+      on_replace: :delete
 
     many_to_many :users, PhoenixShield.User,
       join_through: "user_roles",
