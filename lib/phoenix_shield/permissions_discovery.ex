@@ -23,7 +23,8 @@ defmodule PhoenixShield.PermissionsDiscovery do
 
     Enum.each(discovered, fn {slug, name, description} ->
       # Check if permission exists, if not create it
-      case PhoenixShield.Repo.get_by(PhoenixShield.Permission, slug: slug) do
+      repo = PhoenixShield.Config.repo()
+      case repo.get_by(PhoenixShield.Permission, slug: slug) do
         nil ->
           # Split slug into resource and action
           [resource, action] = String.split(slug, ":")
@@ -36,7 +37,7 @@ defmodule PhoenixShield.PermissionsDiscovery do
             action: action,
             description: description
           })
-          |> PhoenixShield.Repo.insert!()
+          |> repo.insert!()
 
         _existing ->
           :ok # Permission already exists

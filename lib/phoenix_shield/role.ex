@@ -25,5 +25,6 @@ defmodule PhoenixShield.Role do
     |> validate_required([:name, :slug])
     |> unique_constraint(:slug)
     |> unique_constraint(:name)
+    |> put_assoc(:permissions, attrs[:permissions] || [])
   end
 end

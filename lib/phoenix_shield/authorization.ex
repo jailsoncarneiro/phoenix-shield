@@ -3,7 +3,7 @@ defmodule PhoenixShield.Authorization do
   Main authorization module for PhoenixShield. Provides the can? function to check permissions.
   """
   import Ecto.Query
-  alias PhoenixShield.Repo
+  alias PhoenixShield.Config
   alias PhoenixShield.Permission
 
   @doc """
@@ -31,7 +31,7 @@ defmodule PhoenixShield.Authorization do
         where: p.slug == ^permission_slug,
         select: count(p.id)
 
-      Repo.one(query) > 0
+      Config.repo().one(query) > 0
     end
   end
 
@@ -49,7 +49,7 @@ defmodule PhoenixShield.Authorization do
         where: ur.user_id == ^user.id,
         select: p.slug
 
-      Repo.all(query)
+      Config.repo().all(query)
     end
   end
 

@@ -13,7 +13,9 @@ defmodule PhoenixShieldWeb.AuthHook do
     # Get the current user from the session (assuming you store user_id in session)
     user =
       if user_id = session["user_id"] do
-        PhoenixShield.Repo.get(PhoenixShield.User, user_id)
+        repo = PhoenixShield.Config.repo()
+        user_schema = PhoenixShield.Config.user_schema()
+        repo.get(user_schema, user_id)
       else
         nil
       end
