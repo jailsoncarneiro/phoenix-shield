@@ -39,6 +39,7 @@ defmodule PhoenixShieldWeb do
   def controller do
     quote do
       use Phoenix.Controller, formats: [:html, :json]
+      import PhoenixShield.PermissionsDiscovery, only: [permission: 2, permission: 3]
 
       use Gettext, backend: PhoenixShieldWeb.Gettext
 
@@ -51,6 +52,7 @@ defmodule PhoenixShieldWeb do
   def live_view do
     quote do
       use Phoenix.LiveView
+      import PhoenixShield.PermissionsDiscovery, only: [permission: 2, permission: 3]
 
       unquote(html_helpers())
     end
