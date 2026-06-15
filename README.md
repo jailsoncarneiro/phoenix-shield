@@ -1,13 +1,20 @@
 # PhoenixShield 🔒
 A powerful, agnostic Role-Based Access Control (RBAC) library for Phoenix Framework, inspired by Filament Shield for Laravel.
 
+![GitHub Actions](https://github.com/jailson/phoenix_shield/actions/workflows/ci.yml/badge.svg)
+![Hex.pm](https://img.shields.io/hexpm/v/phoenix_shield)
+![Elixir](https://img.shields.io/badge/elixir-1.15%2B-purple)
+![Phoenix](https://img.shields.io/badge/phoenix-1.7%2B-orange)
+
 ## Features
 - 🛡️ **Complete RBAC Engine**: Roles and permissions with many-to-many relationships
 - 🎯 **Slug-based Permissions**: Clean `resource:action` format (e.g., `users:view`, `posts:create`)
+- 🎨 **Filament-Style Admin UI**: Beautiful DaisyUI/Tailwind-powered `RoleManagementLive` with resource grouping and "Select All" toggles
 - 🔍 **Automatic Permission Discovery**: Scans your LiveViews/Controllers to sync permissions to the database
-- ⚡ **LiveView Ready**: Built-in on_mount hook to auto-load user permissions into the socket
+- ⚡ **LiveView Ready**: Built-in on_mount hook to auto-load user permissions into the socket, real-time updates
 - 🚀 **High Performance**: Leverages Ecto queries and Elixir's pattern matching for fast authorization checks
 - 🌐 **Agnostic**: No dependencies on specific app logic, works with any Phoenix project
+- ✅ **Elixir 1.15+ Compatible**: Fully tested on Elixir 1.15.8, 1.17.2 and latest 1.20.0-rc
 
 ## Installation
 1. Add PhoenixShield to your `mix.exs` dependencies:
@@ -56,15 +63,23 @@ end
 ```
 
 ### 4. LiveView Integration
-Add the auth hook to your router to auto-load permissions into the socket:
+Add the auth hook to your router to auto-load permissions into the socket, and enable the admin Role Management UI:
 ```elixir
 # lib/my_app_web/router.ex
 defmodule MyAppWeb.Router do
   use MyAppWeb, :router
   
   on_mount PhoenixShieldWeb.AuthHook
+
+  # Admin routes for role/permission management
+  scope "/admin", MyAppWeb do
+    pipe_through :browser
+    pipe_through :authenticate # Your app's auth pipeline
+    
+    live "/roles", PhoenixShieldWeb.RoleManagementLive, :index
+  end
   
-  # ... routes
+  # ... other routes
 end
 ```
 
